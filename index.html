@@ -260,69 +260,51 @@ document.addEventListener('click', () => {
             console.log('%c' + message, 'color: #FFDF73; background-color: #454545');
         }
 
-        async function InitYSDK() {
-            try {
-                if (IsLocalHost()) return;
-
-                ysdk = await YaGames.init();
-                ysdk.on('game_api_pause', PauseCallback);
-                ysdk.on('game_api_resume', ResumeCallback);
-
-                // Additional init0 modules
-
-                // Additional init1 modules
-
-                // Additional init2 modules
-await InitPlayer();
-LogStyledMessage('Init Authorization ysdk');
-
-
-                // Additional init modules
-await LoadCloud();
-LogStyledMessage('Init Storage ysdk');
-
-
-                initYSDK = true;
-                if (ygGameInstance != null)
-                    ygGameInstance.SendMessage('YG2Instance', 'InitSDKComplete');
-
-                LogStyledMessage('Init YandexSDK Success');
-
-            } catch (e) {
-                console.error('CRASH Initialization SDK: ', e);
-            }
-
-            if (!IsLocalHost() && !syncInit)
-                StartUnityInstance_IfUnloaded();
-        }
-
-        function InitGame() {
-            initGame = true;
-
-            setTimeout(function () {
-                if (isPausedGame == true)
-                    YG2Instance('SetPauseGame', 'true');
-            }, 100);
-
-            // Additional start modules
-        }
-
-        // Additional script modules
-LogStyledMessage('PluginYG2 v2.005  build: 34');
-
-var cloudSaves = NO_DATA;
-
-function SaveCloud(jsonData, flush) {
-    if (player == null) {
-        console.error('CRASH Save Cloud: ', 'Didnt have time to load');
-        return;
-    }
+async function InitYSDK() {
     try {
-        player.setData({
-            saves: [jsonData],
-        }, flush);
+        if (IsLocalHost()) {
+            StartUnityInstance_IfUnloaded();
+            return;
+        }
+
+        // Yandex SDK is not available
+        if (typeof YaGames === "undefined") {
+            console.warn("Yandex Games SDK is not available. Starting Unity without Yandex SDK.");
+
+            initYSDK = false;
+
+            StartUnityInstance_IfUnloaded();
+            return;
+        }
+
+        ysdk = await YaGames.init();
+
+        ysdk.on('game_api_pause', PauseCallback);
+        ysdk.on('game_api_resume', ResumeCallback);
+
+        await InitPlayer();
+        LogStyledMessage('Init Authorization ysdk');
+
+        await LoadCloud();
+        LogStyledMessage('Init Storage ysdk');
+
+        initYSDK = true;
+
+        if (ygGameInstance != null) {
+            ygGameInstance.SendMessage(
+                'YG2Instance',
+                'InitSDKComplete'
+            );
+        }
+
+        LogStyledMessage('Init YandexSDK Success');
+
     } catch (e) {
-        console.error('CRASH Save Cloud: ', e.message);
+        console.error('CRASH Initialization SDK:', e);
+
+        // Don't prevent Unity from starting if Yandex initialization fails
+        initYSDK = false;
+        StartUnityInstance_IfUnloaded();
     }
 }
 
