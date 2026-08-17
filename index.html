@@ -43,19 +43,18 @@
 </div>
 <!-- Additional body modules -->
 <script>
-        const hideFullScreenButton = "";
-        const buildUrl = "Build";
-        const loaderUrl = buildUrl + "/ChipBomb.loader.js";
-        const config = {
-            dataUrl: buildUrl + "/ChipBomb.data.unityweb",
-            frameworkUrl: buildUrl + "/ChipBomb.framework.js.unityweb",
-            codeUrl: buildUrl + "/ChipBomb.wasm.unityweb",
-        streamingAssetsUrl: "StreamingAssets",
-            companyName: "DefaultCompany",
-            productName: "Marvel Tycoon",
-            productVersion: "0.1"
-        };
+const config = {
+    dataUrl: buildUrl + "/ChipBomb.data.unityweb",
+    frameworkUrl: buildUrl + "/ChipBomb.framework.js.unityweb",
+    codeUrl: buildUrl + "/ChipBomb.wasm.unityweb",
+    streamingAssetsUrl: "StreamingAssets",
 
+    companyName: "DefaultCompany",
+    productName: "Marvel Tycoon",
+    productVersion: "0.1",
+
+    autoSyncPersistentDataPath: true
+};
         const container = document.querySelector("#unity-container");
         const canvas = document.querySelector("#unity-canvas");
         const loadingCover = document.querySelector("#loading-cover");
@@ -108,12 +107,13 @@
             SetVisibility(true);
         });
 
-        document.addEventListener('click', () => {
-          const canvas = document.getElementById('canvas');
-          if (canvas && canvas.requestPointerLock) {
-            canvas.requestPointerLock({ unadjustedMovement: true });
-          }
-        });
+document.addEventListener('click', () => {
+    const canvas = document.getElementById('unity-canvas');
+
+    if (canvas && canvas.requestPointerLock) {
+        canvas.requestPointerLock({ unadjustedMovement: true });
+    }
+});
 
         function InstallBlurFocusBlocker() {
             if (!('onblur' in document)) return;
